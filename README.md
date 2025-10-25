@@ -10,6 +10,13 @@ How to run
   - PowerShell: `cd onthisday; python -m http.server 8000` then open http://localhost:8000
   - Or use any static server.
 
+Deploy on GitHub Pages
+- Ensure GitHub Pages is enabled for the repo:
+  1) Open GitHub → repo → Settings → Pages
+  2) Under "Build and deployment", choose "GitHub Actions"
+  3) Save. Then push to `main` to trigger deployment.
+  Note: If Actions shows "Resource not accessible by integration", Pages likely isn’t enabled yet for the repo.
+
 Features
 - Date picker (defaults to today).
 - Language selector (en, it, es, de, fr, pt, ru, ja, zh, ar).
@@ -20,4 +27,3 @@ Features
 Notes
 - Data is fetched from `https://{lang}.wikipedia.org/api/rest_v1/feed/onthisday/{type}/{MM}/{DD}` with CORS enabled by Wikipedia.
 - Credit: Content from Wikipedia; see their terms for usage and attribution.
-
