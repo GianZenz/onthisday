@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>On This Day — Wikipedia</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>On This Day</h1>
+      <p class="subtitle">Events, births, and deaths from Wikipedia</p>
+    </header>
+
+    <section class="controls">
+      <div class="control">
+        <label for="date">Date</label>
+        <input id="date" type="date" />
+      </div>
+      <div class="control">
+        <label for="lang">Language</label>
+        <select id="lang">
+          <option value="en">English</option>
+          <option value="it">Italiano</option>
+          <option value="es">Español</option>
+          <option value="de">Deutsch</option>
+          <option value="fr">Français</option>
+          <option value="pt">Português</option>
+          <option value="ru">Русский</option>
+          <option value="ja">日本語</option>
+          <option value="zh">中文</option>
+          <option value="ar">العربية</option>
+        </select>
+      </div>
+      <div class="control toggles">
+        <label><input id="toggle-events" type="checkbox" checked /> Events</label>
+        <label><input id="toggle-births" type="checkbox" checked /> Births</label>
+        <label><input id="toggle-deaths" type="checkbox" checked /> Deaths</label>
+      </div>
+      <div class="control">
+        <button id="refresh">Refresh</button>
+      </div>
+    </section>
+
+    <section id="status" class="status" hidden></section>
+
+    <main class="results">
+      <section id="events" class="panel" data-type="events">
+        <div class="panel-header">
+          <h2>Events</h2>
+          <span class="count" id="count-events"></span>
+        </div>
+        <ul class="items" id="list-events"></ul>
+        <button class="show-more" id="more-events" hidden>Show more</button>
+      </section>
+
+      <section id="births" class="panel" data-type="births">
+        <div class="panel-header">
+          <h2>Births</h2>
+          <span class="count" id="count-births"></span>
+        </div>
+        <ul class="items" id="list-births"></ul>
+        <button class="show-more" id="more-births" hidden>Show more</button>
+      </section>
+
+      <section id="deaths" class="panel" data-type="deaths">
+        <div class="panel-header">
+          <h2>Deaths</h2>
+          <span class="count" id="count-deaths"></span>
+        </div>
+        <ul class="items" id="list-deaths"></ul>
+        <button class="show-more" id="more-deaths" hidden>Show more</button>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>
+        Data from Wikipedia On This Day API. Content is available under
+        their respective licenses.
+      </p>
+      <p>
+        <a id="share-link" href="#">Share this view</a>
+      </p>
+    </footer>
+
+    <script src="app.js" defer></script>
+  </body>
+  </html>
+
