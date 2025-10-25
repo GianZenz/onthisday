@@ -68,7 +68,7 @@
 
   function saveSettings() {
     const settings = {
-      date: DOM.date.value,
+      // Intentionally do not persist date to always default to today
       lang: DOM.lang.value,
       toggles: {
         events: DOM.toggles.events.checked,
@@ -486,6 +486,13 @@
     const today = new Date();
     const query = fromQuery();
     const saved = loadSettings();
+    // One-time cleanup: remove any previously stored date
+    if (saved && 'date' in saved) {
+      try {
+        delete saved.date;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(saved));
+      } catch {}
+    }
 
     // Default to today's date unless a query param is provided.
     let initDate = query.date || today;
