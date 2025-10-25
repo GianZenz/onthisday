@@ -487,7 +487,8 @@
     const query = fromQuery();
     const saved = loadSettings();
 
-    let initDate = query.date || (saved?.date ? new Date(saved.date) : today);
+    // Default to today's date unless a query param is provided.
+    let initDate = query.date || today;
     // Ensure year is current for nice UX in date input
     initDate = new Date(today.getFullYear(), initDate.getMonth(), initDate.getDate());
     DOM.date.value = toYMD(initDate);
