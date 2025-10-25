@@ -120,6 +120,29 @@ body {
 .title-link { color: var(--text); text-decoration: none; font-weight: 600; }
 .title-link:hover { text-decoration: underline; }
 
+/* Category chips for Events */
+.item-cats { margin-top: 8px; }
+.cat-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.cat-chip {
+  font-size: 12px;
+  color: var(--text);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  padding: 2px 8px;
+  border-radius: 999px;
+}
+
+.chips-more {
+  margin-top: 6px;
+  padding: 4px 8px;
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+}
+
 .show-more {
   margin: 6px 12px 12px;
   padding: 8px 10px;

@@ -187,6 +187,8 @@
 
   const summaryCache = new Map(); // key: lang:title -> {extract, thumbnail, description, url}
   const inflight = new Map();
+  const catCache = new Map(); // key: lang:title -> [categories]
+  const inflightCats = new Map();
 
   function topPage(item) {
     return item?.pages && item.pages[0] ? item.pages[0] : null;
@@ -212,6 +214,29 @@
       return data;
     })().finally(() => inflight.delete(key));
     inflight.set(key, p);
+    return p;
+  }
+
+  async function fetchCategoriesByTitle(lang, title) {
+    const key = `${lang}:${title}`;
+    if (catCache.has(key)) return catCache.get(key);
+    if (inflightCats.has(key)) return inflightCats.get(key);
+    const p = (async () => {
+      const url = `https://${lang}.wikipedia.org/w/api.php?action=query&format=json&origin=*&prop=categories&clshow=!hidden&cllimit=20&titles=${encodeURIComponent(title)}`;
+      const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+      if (!res.ok) throw new Error(`categories ${res.status}`);
+      const j = await res.json();
+      const pages = j?.query?.pages || {};
+      const first = Object.values(pages)[0] || {};
+      const cats = (first.categories || []).map(c => {
+        const t = c.title || '';
+        const idx = t.indexOf(':');
+        return idx >= 0 ? t.slice(idx + 1) : t;
+      }).filter(Boolean);
+      catCache.set(key, cats);
+      return cats;
+    })().finally(() => inflightCats.delete(key));
+    inflightCats.set(key, p);
     return p;
   }
 
@@ -268,6 +293,12 @@
     return img || ext;
   }
 
+  function renderCatsHtml(cats) {
+    if (!cats || !cats.length) return '';
+    const chips = cats.slice(0, 8).map(c => `<span class="cat-chip">${escapeHtml(c)}</span>`).join('');
+    return `<div class="cat-chips">${chips}</div>`;
+  }
+
   // Lazy loading support
   function appendItems(type, start, end) {
     const state = categoryState[type];
@@ -291,9 +322,11 @@
         <div><span class="item-year">${it.year}</span><span class="item-text">${escapeHtml(it.text || '')}</span></div>
         ${topLink ? `<div class="item-links">Related: <a class="title-link" href="${topLink}" target="_blank" rel="noopener">${escapeHtml(topTitle)}</a></div>` : ''}
         <div class="item-extra"></div>
+        <div class="item-cats"></div>
       `;
 
       const extra = li.querySelector('.item-extra');
+      const catsEl = li.querySelector('.item-cats');
       if (p && (thumb || extract)) {
         extra.innerHTML = renderExtraHtml(thumb, extract, topLink, topTitle);
       } else if (p && topTitle) {
@@ -302,6 +335,41 @@
           fetchSummaryByTitle(lang, topTitle)
             .then(sum => { extra.innerHTML = renderExtraHtml(sum.thumbnail, sum.extract, sum.url, sum.title); })
             .catch(() => { extra.textContent = ''; })
+        );
+      }
+
+      if (type === 'events' && p && topTitle) {
+        catsEl.textContent = 'Loading categories…';
+        pending.push(
+          fetchCategoriesByTitle(lang, topTitle)
+            .then(cats => {
+              catsEl.innerHTML = renderCatsHtml(cats);
+              const spans = catsEl.querySelectorAll('.cat-chip');
+              const total = spans.length;
+              if (total > 3) {
+                for (let i = 3; i < total; i++) spans[i].style.display = 'none';
+                const btn = document.createElement('button');
+                btn.className = 'chips-more';
+                btn.dataset.expanded = 'false';
+                const moreLabel = () => `Show more (${total - 3})`;
+                const lessLabel = () => 'Show less';
+                btn.textContent = moreLabel();
+                btn.addEventListener('click', () => {
+                  const expanded = btn.dataset.expanded === 'true';
+                  if (expanded) {
+                    for (let i = 3; i < total; i++) spans[i].style.display = 'none';
+                    btn.dataset.expanded = 'false';
+                    btn.textContent = moreLabel();
+                  } else {
+                    for (let i = 3; i < total; i++) spans[i].style.display = '';
+                    btn.dataset.expanded = 'true';
+                    btn.textContent = lessLabel();
+                  }
+                });
+                catsEl.appendChild(btn);
+              }
+            })
+            .catch(() => { catsEl.textContent = ''; })
         );
       }
 
